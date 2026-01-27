@@ -15,7 +15,7 @@
 
 UAV-OMVCD 基于多期次无人机倾斜全景影像构建，采集区域覆盖合肥、唐山、南京等典型城市场景。相较传统正射影像的垂直视角，本数据集采用**多角度倾斜观测**，更有效覆盖地物侧立面及部分隐蔽区域，从而提升复杂城市场景下变化区域的可辨识性，并降低季节性伪变化干扰。
 
-为确保监督信号清晰且训练稳定，我们从人工标绘样本中筛选 **变化区域占比 > 1%** 的图像对进入本 BCD 子集，从而避免变化区域极端稀疏导致的训练不稳定与评估偏差。
+为确保监督信号清晰且训练稳定，我们从人工标绘样本中筛选 **变化区域占比 > 3%** 的图像对进入本 BCD 子集，从而避免变化区域极端稀疏导致的训练不稳定与评估偏差。
 
 ---
 
@@ -25,12 +25,11 @@ UAV-OMVCD 基于多期次无人机倾斜全景影像构建，采集区域覆盖�
 
 ```text
 Baidu Netdisk:
-https://pan.baidu.com/s/1BVIe4I40zSQPeJR630HZ6g?pwd=DATA
+https://pan.baidu.com/s/1j1ecg5zEXq0i0e8UxfKoqg?pwd=DATA
 Code: DATA
 
 Google Drive:
-https://drive.google.com/file/d/1ynDMNmIa-XB6_oG9hFaf1vTpoWUi50AR/view?usp=drive_link
-https://drive.google.com/file/d/1mjX2lSGRINDa4TV3Q58tJv_HeyqdV7hO/view?usp=drive_link
+https://drive.google.com/file/d/1mJ7lOPWW1tOSaU7cCsq4kSX2XYhFLZUA/view?usp=drive_link
 ````
 
 ---
@@ -69,7 +68,6 @@ train/Label/sample_001.png
 * `Label` 为单通道二值掩膜图，像素值集合为 `{0, 255}`
 * **默认约定**：`0 = 未变化`，`255 = 变化`
 
-> 注：若你在发布版本中采用相反编码，请在此处显式说明，并在代码示例中同步修改。
 
 ---
 
@@ -122,8 +120,6 @@ train/Label/sample_001.png
 
 ## 5. 快速开始（数据读取示例）
 
-> 以下为最简索引示例（可按你的框架改写）：
-
 ```python
 import os
 from PIL import Image
@@ -164,13 +160,8 @@ mask = Image.open(os.path.join(root, split, "Label", name))  # single-channel {0
 
 ## 8. 联系方式（Contact）
 
-* Maintainer：TODO
-* Email：TODO
-* Issue：欢迎在本仓库提交问题与建议
+* Maintainer：Runtian Wang
+* Email：1025071815@njupt.com
+* 提交问题与建议
 
-```
-
----
-
-如果你把 **DOI 链接、许可类型、作者/单位** 这三项补全，我也可以顺手帮你把 README 里的 `TODO` 全部替换成最终版本，并给你一段更“论文风格”的 **数据集贡献点（Contributions）** 段落（更适合放在 GitHub 首页 + 论文数据集章节里）。
 ```
