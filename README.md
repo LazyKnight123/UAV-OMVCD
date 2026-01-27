@@ -1,140 +1,195 @@
-# UAV-OMVCD
+下面给你一份**可直接用于 GitHub 仓库首页**的 `README.md`（面向你当前的 **BCD（二分类变化检测）版本**，格式对标 LEVIR-CD 风格，信息完整、可复现、便于他人直接跑通数据加载与基准实验）。你只需要把其中 `DOI`、`License`、`Citation` 里 `TODO` 的位置按你的实际信息替换即可。
 
-**UAV-OMVCD (Unmanned Aerial Vehicle–Oblique Multi-View Panoramic Change Detection Dataset)**
-无人机倾斜多视角全景语义变化检测数据集，用于 **语义变化检测（Semantic Change Detection, SCD）** 与 **变化检测（Change Detection, CD）** 等任务。
+````markdown
+# UAV-OMVCD (BCD)
 
-## 1. 简介
+**UAV-OMVCD**：无人机倾斜多视角全景变化检测数据集（Binary Change Detection, BCD）。  
+本仓库发布 UAV-OMVCD 的二分类变化检测版本，面向中国典型区域的用地变化检测研究与模型开发。
 
-为建立一个**样本数量充足、类别覆盖合理、像素级标注规范**的语义变化检测（SCD）基准，我们构建了 **UAV-OMVCD**。数据采集于合肥、唐山、南京等典型区域的多期次无人机倾斜全景影像，重点覆盖与城市场景密切相关的关键地物变化（如硬化地表、工程机械、建筑物、温室大棚、堆土等），系统记录其在不同时间节点下的**结构增减、形态演变、缺陷演化**等变化特征。
+- **Task**: Binary Change Detection (BCD)
+- **Image size**: 512 × 512 (PNG)
+- **Splits**: train / val / test（固定划分，可复现实验）
+- **Download**: Baidu Netdisk & Google Drive（见下文）
+- **DOI**: TODO（开放科学数据平台 DOI 链接）
 
-与传统正射影像的垂直视角不同，UAV-OMVCD 采用**多角度倾斜观测**，可覆盖地物侧立面与部分隐蔽区域，从而提升复杂城市场景下变化识别的有效性，并降低季节性伪变化带来的干扰。
+---
 
-## 2. 数据构建与标注说明
+## 1. Dataset Overview
 
-* **切片大小**：每张图像为 `512 × 512`
-* **筛选策略**：从人工标绘的多分类变化样本中筛选 **变化区域占比 > 1%** 的图像对，以保证训练样本包含足够变化信息，降低极端稀疏变化导致的训练不稳定。
-* **标注粒度**：像素级精确标注
-* **标注流程**：由遥感图像处理领域专家团队完成，并经过严格质检与复核流程，以确保标签准确性。
+UAV-OMVCD 由研究团队对中国境内典型区域的无人机倾斜全景影像进行人工标注构建。数据集中每个样本由两期（或两视角）高分辨率影像对组成，并提供像素级二分类变化掩膜，用于监督训练与标准化评测。
 
-## 3. 类别体系（10类）
+该数据集组织格式参照 **LEVIR-CD** 的层次化结构，能够直接适配多种主流变化检测/语义分割框架的数据加载流程（如 BIT、ChangeMamba、CDLamba、SARASNet、CDXLSTM 等）。
 
-本数据集关注 10 个主要土地覆盖类别（类别 ID 为 `0–9`）：
+---
 
-| ID | 类别名称                             |
-| -: | -------------------------------- |
-|  0 | 背景（Background）                   |
-|  1 | 建筑（Building）                     |
-|  2 | 水域（Water）                        |
-|  3 | 硬化地表（Paved/Impervious Surface）   |
-|  4 | 绿地（Greenland/Vegetation）         |
-|  5 | 推堆土（Earthwork/Soil Pile）         |
-|  6 | 耕地（Farmland）                     |
-|  7 | 构筑物（Structures / Infrastructure） |
-|  8 | 养殖（Aquaculture）                  |
-|  9 | 其他（Other）                        |
+## 2. Data Format & Directory Structure
 
-**类别解释补充：**
+数据集根目录包含 `train/`, `val/`, `test/` 三个子集，每个子集目录下包含一致的三类文件夹：
 
-* **硬化地表**：不透水地面与人工铺装区域
-* **绿地**：公园、草坪等植被覆盖区域
-* **推堆土**：施工场地与土方工程区域
-* **构筑物**：桥梁、道路、码头等基础设施
-* **养殖**：水产养殖池塘等区域
+- `A/`：前时相/视角影像（PNG，512×512）
+- `B/`：后时相/视角影像（PNG，512×512，与 A 按文件名一一对应）
+- `Label/`：二分类变化掩膜（PNG，单通道灰度图，与 A/B 同名）
 
-> 10 个语义类别在两期（T1/T2）的组合可形成 **100 种变化类别组合（包含无变化）**。本版本通过阈值筛选策略使数据更符合“变化发生时的真实分布”，同时保证任务的可训练性。
+同时：
+- 每个子集中提供 `img.txt`：该子集全部样本文件名列表（不含路径），便于快速索引与批量读取；
+- 根目录提供 `list/` 文件夹保存划分信息：`train.txt`, `val.txt`, `test.txt` 分别给出三子集的文件名清单，用于**可复现划分协议**。
 
-## 4. 数据组织结构
-
-`UAV-OMVCD` 采用层次化目录结构，划分为 `train / val / test`，比例为 **7 : 2 : 1**。每个 split 下包含五类文件夹，分别对应 SCD 所需的输入与监督：
-
-* `T1/`：时相 T1 原始影像
-* `T2/`：时相 T2 原始影像
-* `GT_T1/`：T1 语义标签（单通道，像素值 0–9）
-* `GT_T2/`：T2 语义标签（单通道，像素值 0–9）
-* `GT_CD/`：变化标签（单通道二值掩膜，0=未变化，非0=变化）
-
-目录示意：
+目录示意如下：
 
 ```text
-UAV-OMVCD/
+UAV-OMVCD_BCD/
 ├── train/
-│   ├── T1/
-│   ├── T2/
-│   ├── GT_T1/
-│   ├── GT_T2/
-│   └── GT_CD/
+│   ├── A/
+│   ├── B/
+│   ├── Label/
+│   └── img.txt
 ├── val/
-│   ├── T1/
-│   ├── T2/
-│   ├── GT_T1/
-│   ├── GT_T2/
-│   └── GT_CD/
+│   ├── A/
+│   ├── B/
+│   ├── Label/
+│   └── img.txt
 ├── test/
-│   ├── T1/
-│   ├── T2/
-│   ├── GT_T1/
-│   ├── GT_T2/
-│   └── GT_CD/
-├── train.txt
-├── val.txt
-└── test.txt
-```
+│   ├── A/
+│   ├── B/
+│   ├── Label/
+│   └── img.txt
+└── list/
+    ├── train.txt
+    ├── val.txt
+    └── test.txt
+````
 
-### 样本命名规则
+### 2.1 Sample Pairing
 
-同一样本的五个文件**同名**，分别位于对应目录。例如 `sample_001.png`：
-
-```text
-train/T1/sample_001.png
-train/T2/sample_001.png
-train/GT_T1/sample_001.png
-train/GT_T2/sample_001.png
-train/GT_CD/sample_001.png
-```
-
-同时，根目录提供：
-
-* `train.txt` / `val.txt` / `test.txt`：列出 split 中所有样本文件名（不含路径），便于程序化读取与复现实验划分。
-
-## 5. 任务定义（推荐用法）
-
-* **CD（变化检测）**：输入 `(T1, T2)`，监督 `GT_CD`（二值）
-* **T1 语义分割**：输入 `T1`，监督 `GT_T1`
-* **T2 语义分割**：输入 `T2`，监督 `GT_T2`
-* **SCD（语义变化检测）**：联合利用 `GT_T1`、`GT_T2` 与 `GT_CD`，评估“哪里变化 + 变成什么/从什么变来”的语义变化能力
-
-## 6. 数据集获取
-
-下载地址如下（建议在论文/项目中标注数据集版本号 `UAV-OMVCD`）：
+对任一文件名 `xxx.png`，对应三者为：
 
 ```text
-Baidu Netdisk:
-https://pan.baidu.com/s/1BVIe4I40zSQPeJR630HZ6g?pwd=DATA
+split/A/xxx.png
+split/B/xxx.png
+split/Label/xxx.png
+```
+
+### 2.2 Label Definition (Binary Mask)
+
+`Label` 为单通道灰度掩膜，像素值含义为：
+
+* `0`：未变化（No-change）
+* `255`：变化（Change）
+
+> 注：如你在训练代码中使用 `0/1`，可在读取时将 `255` 映射为 `1`。
+
+---
+
+## 3. Data Splits & Statistics
+
+本版本采用固定划分，确保训练、验证与测试相互独立：
+
+* **train**: 1735 pairs
+* **val**: 225 pairs
+* **test**: 221 pairs
+
+数据集总计：**2181** 组影像对（A/B/Label 为一个样本单元）。
+
+---
+
+## 4. Benchmark Experiments (120 epochs)
+
+为验证数据集可用性与难度水平，我们在统一软硬件环境与训练协议下，选取 5 个代表性的二分类变化检测模型进行对比实验：
+
+* **BIT**
+* **ChangeMamba**
+* **CDLamba**
+* **SARASNet**
+* **CDXLSTM**
+
+### 4.1 Experimental Setup
+
+* **GPU**: NVIDIA RTX 4090 (24GB)
+* **CPU**: Intel Xeon Platinum 8352V
+* **RAM**: 120GB
+* **Storage**: 2TB
+* **OS**: Ubuntu 20.04
+* **Python**: 3.8
+* **CUDA**: 11.8
+* **PyTorch**: 2.0.1 (cu118)
+
+Training protocol:
+
+* Train **120 epochs**
+* Select the checkpoint with the best **F1-score** on validation during evaluation, and report results on test set.
+
+Metrics:
+
+* OA, Precision, Recall, F1-score, IoU
+
+### 4.2 Test Results
+
+| Model       |         OA |  Precision |     Recall |   F1-score |        IoU |
+| ----------- | ---------: | ---------: | ---------: | ---------: | ---------: |
+| BIT         |     0.9457 |     0.9071 |     0.8803 |     0.8930 |     0.8150 |
+| ChangeMamba |     0.9429 |     0.9027 |     0.8729 |     0.8869 |     0.8060 |
+| **CDLamba** | **0.9492** | **0.9107** | **0.8914** | **0.9007** | **0.8266** |
+| SARASNet    |     0.9429 |     0.9050 |     0.8698 |     0.8861 |     0.8049 |
+| CDXLSTM     |     0.9487 |     0.9139 |     0.8851 |     0.8987 |     0.8236 |
+
+整体上，各模型在测试集上表现稳定且接近（OA≈0.9429–0.9492；F1≈0.8861–0.9007；IoU≈0.8049–0.8266），说明 UAV-OMVCD_BCD 提供了清晰有效的监督信号，并能支持稳定训练与泛化。误差主要集中在高分辨率倾斜影像常见困难情形：细窄/碎片化结构、边界过渡带，以及视角差异、光照/阴影变化、纹理相似导致的外观歧义区域。
+
+---
+
+## 5. Download
+
+我们提供两种下载方式（建议使用固定划分的 `list/` 文件以确保可复现实验）：
+
+**Baidu Netdisk**
+[https://pan.baidu.com/s/1BVIe4I40zSQPeJR630HZ6g?pwd=DATA](https://pan.baidu.com/s/1BVIe4I40zSQPeJR630HZ6g?pwd=DATA)
 Code: DATA
 
-Google Drive:
-https://drive.google.com/file/d/1ynDMNmIa-XB6_oG9hFaf1vTpoWUi50AR/view?usp=drive_link
-https://drive.google.com/file/d/1mjX2lSGRINDa4TV3Q58tJv_HeyqdV7hO/view?usp=drive_link
-```
+**Google Drive**
+[https://drive.google.com/file/d/1ynDMNmIa-XB6_oG9hFaf1vTpoWUi50AR/view?usp=drive_link](https://drive.google.com/file/d/1ynDMNmIa-XB6_oG9hFaf1vTpoWUi50AR/view?usp=drive_link)
+[https://drive.google.com/file/d/1mjX2lSGRINDa4TV3Q58tJv_HeyqdV7hO/view?usp=drive_link](https://drive.google.com/file/d/1mjX2lSGRINDa4TV3Q58tJv_HeyqdV7hO/view?usp=drive_link)
 
-## 7. 引用（Citation）
+**DOI (Open Science Platform)**
+TODO: 在此处添加 DOI 链接（推荐同时给出版本号/发布日期）
 
-如果该数据集对你的研究有帮助，请引用我们的工作（BibTeX 可在论文确定后替换）：
+---
+
+## 6. Citation
+
+如果本数据集对你的研究有帮助，请引用（将作者、年份、DOI 按实际情况替换）：
 
 ```bibtex
-@dataset{UAV-OMVCD,
-  title   = {UAV-OMVCD: Unmanned Aerial Vehicle–Oblique Multi-View Panoramic Semantic Change Detection Dataset},
+@dataset{UAV-OMVCD_BCD,
+  title   = {UAV-OMVCD: Oblique Multi-View Panoramic UAV Dataset for Binary Change Detection},
   author  = {TODO},
   year    = {2026},
-  note    = {Version: SCD_512_Single_1Percent}
+  doi     = {TODO},
+  note    = {Binary Change Detection (512x512), fixed train/val/test split}
 }
 ```
 
-## 8. 许可与声明（License）
+---
 
+## 7. License
 
-## 9. 联系方式（Contact）
+* Dataset License: **TODO**（建议：CC BY 4.0 / CC BY-NC 4.0 / Academic Use Only）
+* 如包含第三方底图/敏感区域，请在此处补充合规声明与使用限制。
 
-* 维护者：Runtian Wang
-* Email：1025071815@njupt.edu.cn
-* Issues：欢迎在本仓库提交问题与建议
+---
+
+## 8. Contact
+
+* Maintainer: TODO
+* Email: TODO
+* Issues: 欢迎在本仓库提交问题与建议
+
+```
+
+---
+
+如果你希望 README 更“顶会风格”，我建议再补两块（我也可以直接帮你写好）：
+
+1) **Quick Start (Data Loader)**：给一段最小可用的 Python 读取示例（读取 A/B/Label，处理 0/255→0/1）  
+2) **Qualitative Visualization**：放一张 `image1 | image2 | mask` 的示例拼图（你论文里“如图所示”的那张），让别人一眼知道数据是什么样子
+
+你把 **DOI 链接**、**License 想用哪种**、以及是否要加 **示例图文件名/路径**（比如 `assets/preview.png`）告诉我，我就把 README 进一步“最终定稿版”给你。
+```
