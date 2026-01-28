@@ -104,7 +104,7 @@ Benchmark results of all models on this dataset:
 | SARASNet    | 0.9429     | 0.9050     | 0.8698     | 0.8861     | 0.8049     |
 | CDXLSTM     | 0.9487     | 0.9139     | 0.8851     | 0.8987     | 0.8236     |
 
-### 4.3 Discussion (Brief)
+### 4.3 Discussion
 
 All five benchmark models achieve stable and strong performance on the test set (OA ≈ 0.9429–0.9492, F1 ≈ 0.8861–0.9007, IoU ≈ 0.8049–0.8266), indicating that this dataset provides clear supervision signals and supports stable training and generalization. The best-performing model, CDLamba, reaches OA = 0.9492, F1 = 0.9007, and IoU = 0.8266. The remaining models perform closely, suggesting that the dataset is not overly biased toward a specific architecture or inductive bias, and can serve as a general benchmarking resource for change detection methods.
 
@@ -147,7 +147,7 @@ If this dataset is helpful for your research, please cite our work (you may add 
 
 ## 7. License and Disclaimer
 
-* Dataset license: `TODO (e.g., Academic Use Only)`
+* Dataset license: `TODO (Academic Use Only)`
 * For research/teaching purposes only.
 
 ---
