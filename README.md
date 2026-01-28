@@ -24,12 +24,7 @@ UAV-OMVCD 基于多期次无人机倾斜全景影像构建，采集区域覆盖�
 - 下载地址（镜像）：
 
 ```text
-Baidu Netdisk:
-https://pan.baidu.com/s/1j1ecg5zEXq0i0e8UxfKoqg?pwd=DATA
-Code: DATA
 
-Google Drive:
-https://drive.google.com/file/d/1mJ7lOPWW1tOSaU7cCsq4kSX2XYhFLZUA/view?usp=drive_link
 ````
 
 ---
