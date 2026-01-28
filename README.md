@@ -6,6 +6,7 @@
 * Image format: PNG
 * Resolution: 512 × 512
 * Data split: Train / Val / Test = 1735 / 225 / 221 (fixed split for reproducible experiments)
+* Overall change proportion: 14.3%
 * Reference organization: LEVIR-CD (train/val/test + A/B/Label + list)
 
 ---
