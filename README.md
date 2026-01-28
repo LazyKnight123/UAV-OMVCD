@@ -1,69 +1,71 @@
-
 # UAV-OMVCD (BCD Subset)
 
-**UAV-OMVCD**：无人机倾斜多视角全景变化检测数据集  
-**本仓库发布内容**：UAV-OMVCD 的 **BCD（二分类变化检测）** 子集（对标 Levir-CD 组织格式），面向中国典型区域用地变化检测研究与模型开发。
+**UAV-OMVCD**: UAV Oblique Multi-View Panoramic Change Detection Dataset
+**Content released in this repository**: the **BCD (Binary Change Detection)** subset of UAV-OMVCD (organized in a **LEVIR-CD-compatible** format), designed for land-use change detection research and model development in typical regions across China.
 
-- 图像格式：PNG  
-- 分辨率：512 × 512  
-- 数据划分：Train / Val / Test = 1735 / 225 / 221（固定划分，可复现实验）  
-- 参考格式：Levir-CD（train/val/test + A/B/Label + list）
-
----
-
-## 1. 数据集简介
-
-UAV-OMVCD 基于多期次无人机倾斜全景影像构建，采集区域覆盖合肥、唐山、南京等典型城市场景。相较传统正射影像的垂直视角，本数据集采用**多角度倾斜观测**，更有效覆盖地物侧立面及部分隐蔽区域，从而提升复杂城市场景下变化区域的可辨识性，并降低季节性伪变化干扰。
+* Image format: PNG
+* Resolution: 512 × 512
+* Data split: Train / Val / Test = 1735 / 225 / 221 (fixed split for reproducible experiments)
+* Reference organization: LEVIR-CD (train/val/test + A/B/Label + list)
 
 ---
 
-## 2. 数据集获取
+## 1. Dataset Overview
 
-- 下载地址：
+UAV-OMVCD is constructed from multi-temporal UAV oblique panoramic imagery, with acquisition regions covering representative urban scenes such as Hefei, Tangshan, and Nanjing. Compared with conventional orthophotos (nadir/vertical view), this dataset adopts **multi-angle oblique observations**, which better capture building facades and partially occluded areas. As a result, it improves the discriminability of changed regions in complex urban environments and reduces pseudo-changes caused by seasonal variations.
+
+---
+
+## 2. Dataset Access
+
+* Download:
+
 ```text
-通过联系邮箱1025071815@njupt.com申请
-````
+Please request access via email: 1025071815@njupt.com
+```
+
 ---
 
-## 3. 数据格式与组织结构（Levir-CD Compatible）
+## 3. Data Format and Organization (LEVIR-CD Compatible)
 
-数据集根目录包含 `train/ val/ test/` 三个子集，分别用于训练、验证与最终测试评估。每个子集均包含一致的子目录结构：
+The dataset root directory contains three subsets: `train/ val/ test/`, used for training, validation, and final testing, respectively. Each subset follows the same directory structure:
 
-* `A/`：第一时相（image1）原始影像（PNG，512×512）
-* `B/`：第二时相（image2）原始影像（PNG，512×512，与 A 按文件名一一对应）
-* `Label/`：像素级变化掩膜（PNG，单通道二值）
-* `img.txt`：记录该子集全部样本文件名列表（不含路径）
+* `A/`: first-temporal (image1) raw images (PNG, 512×512)
+* `B/`: second-temporal (image2) raw images (PNG, 512×512, paired one-to-one with `A` by filename)
+* `Label/`: pixel-wise change masks (PNG, single-channel binary)
+* `img.txt`: list of all sample filenames in this split (without paths)
 
-同时根目录还包含 `list/` 文件夹保存固定划分协议：
+In addition, the root directory includes a `list/` folder that stores the fixed split protocol:
 
 * `list/train.txt`
 * `list/val.txt`
 * `list/test.txt`
 
-其中 Train/Val/Test 的样本数量分别为 **1735 / 225 / 221**，确保不同研究者在相同划分下进行可复现对比实验。
+The number of samples in Train/Val/Test is **1735 / 225 / 221**, ensuring that different researchers can conduct reproducible benchmarking under an identical split.
 
-### 3.2 样本对应关系
+### 3.2 Sample Pairing
 
-每个样本由同名文件组成，例如 `sample_001.png`：
+Each sample consists of files sharing the same filename, e.g., `sample_001.png`:
 
 ```text
 train/A/sample_001.png
 train/B/sample_001.png
 train/Label/sample_001.png
 ```
-> ![图片1.png](picture/%E5%9B%BE%E7%89%871.png)
-> 第 1 列 = image1（A），第 2 列 = image2（B），第 3 列 = mask（Label）。
 
-### 3.3 Label 编码约定
+> ![Figure 1.png](picture/%E5%9B%BE%E7%89%871.png)
+> Column 1 = image1 (A), Column 2 = image2 (B), Column 3 = mask (Label).
 
-* `Label` 为单通道二值掩膜图，像素值集合为 `{0, 255}`
-* **默认约定**：`0 = 未变化`，`255 = 变化`
+### 3.3 Label Encoding Convention
+
+* `Label` is a single-channel binary mask with pixel values in `{0, 255}`
+* **Default convention**: `0 = unchanged`, `255 = changed`
 
 ---
 
-## 4. Benchmark：模型训练与精度评价（BCD）
+## 4. Benchmark: Model Training and Evaluation (BCD)
 
-为验证数据集的可用性与训练稳定性，我们在统一实验设置下选取 5 种代表性的变化检测模型进行标准化对比实验：
+To validate dataset usability and training stability, we benchmarked five representative change detection models under a unified experimental setting:
 
 * **BIT**
 * **ChangeMamba**
@@ -71,27 +73,29 @@ train/Label/sample_001.png
 * **SARASNet**
 * **CDXLSTM**
 
-### 4.1 实验设置（统一）
+### 4.1 Unified Experimental Settings
 
-* 数据划分：Train / Val / Test = 1735 / 225 / 221（互不重叠）
-* 训练轮次：120 epochs
-* 模型选择：训练过程中以 **F1** 最优的 checkpoint 进行测试集推理
-* 评价指标：OA、Precision、Recall、F1-score、IoU（像素级分割指标）
+* Data split: Train / Val / Test = 1735 / 225 / 221 (non-overlapping)
+* Training epochs: 120
+* Model selection: during training, the checkpoint with the best **F1** score is used for test-set inference
+* Metrics: OA, Precision, Recall, F1-score, IoU (pixel-wise segmentation metrics)
 
-**软硬件环境：**
+**Hardware/Software Environment:**
 
-* GPU：NVIDIA RTX 4090 (24GB) × 1
-* CPU：Intel Xeon Platinum 8352V
-* RAM：120 GB
-* Disk：2 TB
-* OS：Ubuntu 20.04
-* Python：3.8
-* CUDA：11.8
-* PyTorch：2.0.1 (cu118)
+* GPU: NVIDIA RTX 4090 (24GB) × 1
+* CPU: Intel Xeon Platinum 8352V
+* RAM: 120 GB
+* Disk: 2 TB
+* OS: Ubuntu 20.04
+* Python: 3.8
+* CUDA: 11.8
+* PyTorch: 2.0.1 (cu118)
 
-### 4.2 测试集结果（Table 3）
-本数据集各模型上的训练结果
-![图片2.png](picture/%E5%9B%BE%E7%89%872.png)
+### 4.2 Test Results (Table 3)
+
+Benchmark results of all models on this dataset:
+![Figure 2.png](picture/%E5%9B%BE%E7%89%872.png)
+
 | Model       | OA         | Precision  | Recall     | F1-score   | IoU        |
 | ----------- | ---------- | ---------- | ---------- | ---------- | ---------- |
 | BIT         | 0.9457     | 0.9071     | 0.8803     | 0.8930     | 0.8150     |
@@ -100,15 +104,15 @@ train/Label/sample_001.png
 | SARASNet    | 0.9429     | 0.9050     | 0.8698     | 0.8861     | 0.8049     |
 | CDXLSTM     | 0.9487     | 0.9139     | 0.8851     | 0.8987     | 0.8236     |
 
-### 4.3 结果讨论（简述）
+### 4.3 Discussion (Brief)
 
-五个基准模型在测试集上均取得稳定且较高的性能（OA≈0.9429–0.9492，F1≈0.8861–0.9007，IoU≈0.8049–0.8266），表明本数据集能够提供清晰有效的监督信号，并支持稳定训练与泛化。最优模型 CDLamba 达到 OA=0.9492、F1=0.9007、IoU=0.8266，其余模型表现接近，说明数据集并未过度偏向某一特定网络结构或归纳偏置，可作为变化检测方法的通用评测资源。
+All five benchmark models achieve stable and strong performance on the test set (OA ≈ 0.9429–0.9492, F1 ≈ 0.8861–0.9007, IoU ≈ 0.8049–0.8266), indicating that this dataset provides clear supervision signals and supports stable training and generalization. The best-performing model, CDLamba, reaches OA = 0.9492, F1 = 0.9007, and IoU = 0.8266. The remaining models perform closely, suggesting that the dataset is not overly biased toward a specific architecture or inductive bias, and can serve as a general benchmarking resource for change detection methods.
 
-从可视化定性结果看，模型能够较好恢复多种典型用地变化的主要空间格局与边界轮廓；误差主要集中在高分辨率倾斜影像中普遍存在的困难情形，例如细窄/碎片化结构、边界过渡带，以及受视角差异、光照阴影或纹理相似性影响产生的外观歧义区域。这些误差形态与二分类变化检测任务的典型难点一致，也进一步证明本数据集适合用于评估边界精度、降低误报并提升鲁棒性的算法研究。
+From qualitative visualizations, models can effectively recover the main spatial patterns and boundary outlines of typical land-use changes. Errors mainly occur in challenging scenarios commonly seen in high-resolution oblique imagery, such as thin or fragmented structures, boundary transition regions, and appearance ambiguity caused by viewpoint variations, illumination/shadows, or texture similarity. These error patterns align with common difficulties in binary change detection tasks, further demonstrating that this dataset is suitable for evaluating boundary accuracy, reducing false alarms, and improving robustness.
 
 ---
 
-## 5. 快速开始（数据读取示例）
+## 5. Quick Start (Data Loading Example)
 
 ```python
 import os
@@ -125,9 +129,9 @@ mask = Image.open(os.path.join(root, split, "Label", name))  # single-channel {0
 
 ---
 
-## 6. 引用（Citation）
+## 6. Citation
 
-如果本数据集对你的研究有帮助，请引用我们的工作（发布论文后建议补充正式 BibTeX）：
+If this dataset is helpful for your research, please cite our work (you may add the official BibTeX after the paper is published):
 
 ```bibtex
 @dataset{UAV-OMVCD-BCD,
@@ -135,23 +139,23 @@ mask = Image.open(os.path.join(root, split, "Label", name))  # single-channel {0
   author  = {TODO},
   year    = {2026},
   doi     = {TODO},
-  note    = {Train/Val/Test = 1735/225/221, 512x512 PNG, Levir-CD compatible format}
+  note    = {Train/Val/Test = 1735/225/221, 512x512 PNG, LEVIR-CD compatible format}
 }
 ```
 
 ---
 
-## 7. 许可与声明（License）
+## 7. License and Disclaimer
 
-* 数据集许可：`TODO（Academic Use Only 等）`
-* 仅限科研/教学用途（如适用，请补充具体限制条款）。
+* Dataset license: `TODO (e.g., Academic Use Only)`
+* For research/teaching purposes only.
 
 ---
 
-## 8. 联系方式（Contact）
+## 8. Contact
 
-* Maintainer：Runtian Wang
-* Email：1025071815@njupt.com
-* 提交问题与建议
+* Maintainer: Runtian Wang
+* Email: [1025071815@njupt.com](mailto:1025071815@njupt.com)
+* Issues and suggestions are welcome.
 
 ```
