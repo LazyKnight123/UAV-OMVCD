@@ -22,7 +22,9 @@ UAV-OMVCD is constructed from multi-temporal UAV oblique panoramic imagery, with
 * Download:
 
 ```text
-Please request access via email: 1025071815@njupt.com
+The related work has been submitted for publication, and the accompanying paper is under review. The dataset is currently in a pre-release phase. To request access, please contact the maintainer via the email below:
+
+Access Request Email: 1025071815@njupt.com
 ```
 
 ---
